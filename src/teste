@@ -1,0 +1,6 @@
+import pandas as pd
+df = pd.read_parquet("data/processed/splits/train.parquet")
+print("dist_km nulos:", df["dist_km"].isna().mean() if "dist_km" in df.columns else "coluna ausente")
+if "dist_km" in df.columns:
+    print("valores distintos:", df["dist_km"].nunique())
+    print(df["dist_km"].describe())

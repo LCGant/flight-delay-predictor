@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>🛫 Previsão de Atraso de Voo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark">
+<div class="container">
+  <h1>🛫 Previsão de Atraso de Voo</h1>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Preencha os dados do voo</h2>
+
+      {% if error_msg %}
+        <div class="pill red" style="display:inline-block;margin-bottom:8px;">
+          {{ error_msg }}
+        </div>
+      {% endif %}
+
+
+      <form method="post" novalidate>
+        <div class="row">
+          <label>Companhia</label>
+          <select name="icao_empresa" required>
+            {% for e in empresas %}<option value="{{e}}">{{e}}</option>{% endfor %}
+          </select>
+        </div>
+
+        <div class="row two">
+          <div>
+            <label>Origem</label>
+            <select name="origem_icao" required>
+              {% for a in aerop %}<option value="{{a}}">{{a}}</option>{% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Destino</label>
+            <select name="destino_icao" required>
+              {% for a in aerop %}<option value="{{a}}">{{a}}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row three">
+          <div>
+            <label>Mês</label>
+            <input type="number" min="1" max="12" name="mes" value="12" required>
+          </div>
+          <div>
+            <label>Dia da semana</label>
+            <select name="dia_semana" required>
+              <option value="0">Seg</option><option value="1">Ter</option>
+              <option value="2">Qua</option><option value="3">Qui</option>
+              <option value="4">Sex</option><option value="5">Sáb</option>
+              <option value="6">Dom</option>
+            </select>
+          </div>
+          <div>
+            <label>Hora de partida</label>
+            <input type="number" min="0" max="23" name="hora" value="22" required>
+          </div>
+        </div>
+
+        <div class="row three">
+          <div>
+            <label>Chuva (mm) — opcional</label>
+            <input type="number" step="0.1" name="chuva_mm" placeholder="ex.: 3">
+          </div>
+          <div>
+            <label>Temperatura (°C) — opcional</label>
+            <input type="number" step="0.1" name="temp_c" placeholder="ex.: 23">
+          </div>
+          <div>
+            <label>Vento (km/h) — opcional</label>
+            <input type="number" step="1" name="vento_kmh" placeholder="ex.: 20">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="primary">Consultar</button>
+          <button type="reset" class="ghost">Limpar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Resultado</h2>
+
+      {% if proba is not none %}
+        <div class="big-kpi">
+          Probabilidade de atraso: <span class="kpi">{{ (proba*100)|round(1) }}%</span>
+          {% if will_delay %}
+            <span class="pill red">Vai atrasar</span>
+          {% else %}
+            <span class="pill green">Provável no horário</span>
+          {% endif %}
+        </div>
+        <div class="dim">Threshold: {{ "%.3f"|format(thr) }}</div>
+        <div class="dim">Probabilidade (0–1): {{ "%.3f"|format(proba) }}</div>
+        <hr>
+      {% else %}
+        <p class="dim">Preencha o formulário e clique em <b>Consultar</b>.</p>
+        <hr>
+      {% endif %}
+
+      <h3>Métricas do modelo</h3>
+      <ul class="metrics">
+        <li>ROC-AUC: <b>{{ "%.3f"|format(auc) if auc is not none else "n/d" }}</b></li>
+        <li>PR-AUC: <b>{{ "%.3f"|format(prauc) if prauc is not none else "n/d" }}</b></li>
+        <li class="dim">Modelo: {{ model_type|upper }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>

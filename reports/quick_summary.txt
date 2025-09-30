@@ -1,0 +1,5 @@
+— Resumo rápido —
+Conjunto: TEST | AUC=0.7267 | PR-AUC=0.4805 (baseline=0.238) | F1=0.3422
+Threshold=0.6375 (prec_at(0.6)) | Precision@thr=0.600 | Recall@thr=0.137
+Por 100 voos (TEST): atrasos reais=23.8 | alertas=9.8 | TP=5.7 | FP=4.0
+Classificação offline: ÓTIMO

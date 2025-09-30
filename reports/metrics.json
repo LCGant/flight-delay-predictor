@@ -1,0 +1,288 @@
+{
+  "sizes": {
+    "train": 753326,
+    "val": 152858,
+    "test": 156508
+  },
+  "class_balance": {
+    "train_pos_rate": 0.349999867255345,
+    "val_pos_rate": 0.17530649360844705,
+    "test_pos_rate": 0.23775781429703274
+  },
+  "threshold": 0.6374816558645628,
+  "threshold_policy": {
+    "policy": "prec_at(0.6)",
+    "precision": 0.6,
+    "recall": 0.13747807590401911
+  },
+  "train": {
+    "AUC": 0.7631351335295964,
+    "PR_AUC": 0.6680836206534773,
+    "F1": 0.3518885608369915,
+    "confusion_matrix": [
+      [
+        478126,
+        11536
+      ],
+      [
+        204906,
+        58758
+      ]
+    ],
+    "report": {
+      "0": {
+        "precision": 0.7000052706168964,
+        "recall": 0.9764408918805216,
+        "f1-score": 0.8154318176779279,
+        "support": 489662.0
+      },
+      "1": {
+        "precision": 0.8358892650866361,
+        "recall": 0.2228518113963226,
+        "f1-score": 0.3518885608369915,
+        "support": 263664.0
+      },
+      "accuracy": 0.7126848137459745,
+      "macro avg": {
+        "precision": 0.7679472678517663,
+        "recall": 0.5996463516384221,
+        "f1-score": 0.5836601892574598,
+        "support": 753326.0
+      },
+      "weighted avg": {
+        "precision": 0.7475646506434315,
+        "recall": 0.7126848137459745,
+        "f1-score": 0.65319173931649,
+        "support": 753326.0
+      }
+    }
+  },
+  "val": {
+    "AUC": 0.7158603700809436,
+    "PR_AUC": 0.3913629693827722,
+    "F1": 0.22369979050915384,
+    "confusion_matrix": [
+      [
+        123605,
+        2456
+      ],
+      [
+        23113,
+        3684
+      ]
+    ],
+    "report": {
+      "0": {
+        "precision": 0.8424665003612372,
+        "recall": 0.9805173685755308,
+        "f1-score": 0.9062647784470212,
+        "support": 126061.0
+      },
+      "1": {
+        "precision": 0.6,
+        "recall": 0.13747807590401911,
+        "f1-score": 0.22369979050915384,
+        "support": 26797.0
+      },
+      "accuracy": 0.8327271062031428,
+      "macro avg": {
+        "precision": 0.7212332501806186,
+        "recall": 0.558997722239775,
+        "f1-score": 0.5649822844780875,
+        "support": 152858.0
+      },
+      "weighted avg": {
+        "precision": 0.7999605483653973,
+        "recall": 0.8327271062031428,
+        "f1-score": 0.7866067037517418,
+        "support": 152858.0
+      }
+    }
+  },
+  "test": {
+    "AUC": 0.7267182913611808,
+    "PR_AUC": 0.4804824225609479,
+    "F1": 0.3422140123021843,
+    "confusion_matrix": [
+      [
+        112982,
+        6315
+      ],
+      [
+        28226,
+        8985
+      ]
+    ],
+    "report": {
+      "0": {
+        "precision": 0.8001104753271769,
+        "recall": 0.9470648884716296,
+        "f1-score": 0.8674075353640045,
+        "support": 119297.0
+      },
+      "1": {
+        "precision": 0.5872549019607843,
+        "recall": 0.24146085834833786,
+        "f1-score": 0.3422140123021843,
+        "support": 37211.0
+      },
+      "accuracy": 0.7793020165103381,
+      "macro avg": {
+        "precision": 0.6936826886439806,
+        "recall": 0.5942628734099837,
+        "f1-score": 0.6048107738330943,
+        "support": 156508.0
+      },
+      "weighted avg": {
+        "precision": 0.7495023994426417,
+        "recall": 0.7793020165103381,
+        "f1-score": 0.7425386712378679,
+        "support": 156508.0
+      }
+    }
+  },
+  "features": [
+    "icao_empresa",
+    "origem_icao",
+    "destino_icao",
+    "rota",
+    "mes",
+    "dia_semana",
+    "hora_partida_prevista",
+    "hora_bloco_30",
+    "hora_sin",
+    "hora_cos",
+    "periodo_dia_id",
+    "is_weekend",
+    "is_feriado",
+    "is_vespera_feriado",
+    "em_ferias",
+    "chuva_id",
+    "tempo_ruim_id",
+    "chuva_arr_id",
+    "tempo_ruim_arr_id",
+    "load_origem_15",
+    "dist_km",
+    "airport_size_id",
+    "congestion_ratio",
+    "congestion_bucket",
+    "sched_block_min",
+    "sched_block_bucket",
+    "wx_dep_cov",
+    "wx_dep_all_missing",
+    "wx_arr_cov",
+    "wx_arr_all_missing",
+    "hist_atraso_rota_30",
+    "hist_atraso_empresa_50",
+    "hist_atraso_num_voo_10",
+    "hist_vol_rota_30",
+    "hist_std_rota_30",
+    "hist_atraso_origem_hora_30",
+    "atrasos_mesmo_aeroporto_1h_hist"
+  ],
+  "categorical": [
+    "icao_empresa",
+    "origem_icao",
+    "destino_icao",
+    "rota"
+  ],
+  "numerical": [
+    "mes",
+    "dia_semana",
+    "hora_partida_prevista",
+    "hora_bloco_30",
+    "hora_sin",
+    "hora_cos",
+    "periodo_dia_id",
+    "is_weekend",
+    "is_feriado",
+    "is_vespera_feriado",
+    "em_ferias",
+    "chuva_id",
+    "tempo_ruim_id",
+    "chuva_arr_id",
+    "tempo_ruim_arr_id",
+    "load_origem_15",
+    "dist_km",
+    "airport_size_id",
+    "congestion_ratio",
+    "congestion_bucket",
+    "sched_block_min",
+    "sched_block_bucket",
+    "wx_dep_cov",
+    "wx_dep_all_missing",
+    "wx_arr_cov",
+    "wx_arr_all_missing",
+    "hist_atraso_rota_30",
+    "hist_atraso_empresa_50",
+    "hist_atraso_num_voo_10",
+    "hist_vol_rota_30",
+    "hist_std_rota_30",
+    "hist_atraso_origem_hora_30",
+    "atrasos_mesmo_aeroporto_1h_hist"
+  ],
+  "categorical_idx": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "feature_importance": {
+    "icao_empresa": 0.026332169148218773,
+    "origem_icao": 0.009569874870357464,
+    "destino_icao": 0.01202165997422985,
+    "rota": 0.013973803870143728,
+    "mes": 0.00463086067686693,
+    "dia_semana": 0.005638097883040741,
+    "hora_partida_prevista": 0.011764553090834897,
+    "hora_bloco_30": 0.013180818215710663,
+    "hora_sin": 0.0157038344320564,
+    "hora_cos": 0.009326099438399571,
+    "periodo_dia_id": 0.0051764680102322535,
+    "is_weekend": 0.0033002321831142956,
+    "is_feriado": 0.0006328671283848275,
+    "is_vespera_feriado": 0.00034968997747257,
+    "em_ferias": 0.0008009900304275311,
+    "chuva_id": 0.0033366576739602,
+    "tempo_ruim_id": 0.0030040242277936248,
+    "chuva_arr_id": 0.002628272910655774,
+    "tempo_ruim_arr_id": 0.003191964544694278,
+    "load_origem_15": 0.006078579769932349,
+    "dist_km": 0.010516302757502285,
+    "airport_size_id": 0.0008119429990286463,
+    "congestion_ratio": 0.006177167397163205,
+    "congestion_bucket": 0.002049726317205365,
+    "sched_block_min": 0.014801887518448043,
+    "sched_block_bucket": 0.005135446525726203,
+    "wx_dep_cov": 0.002558016037219059,
+    "wx_dep_all_missing": 0.001312128186938819,
+    "wx_arr_cov": 0.002113393357218454,
+    "wx_arr_all_missing": 0.0010328079321406112,
+    "hist_atraso_rota_30": 0.09330047925856541,
+    "hist_atraso_empresa_50": 0.2536919437859849,
+    "hist_atraso_num_voo_10": 0.17148182739254486,
+    "hist_vol_rota_30": 0.0010519850463492162,
+    "hist_std_rota_30": 0.0625904915138246,
+    "hist_atraso_origem_hora_30": 0.10726073349368422,
+    "atrasos_mesmo_aeroporto_1h_hist": 0.11347220242392925
+  },
+  "model_type": "rf",
+  "params": {
+    "iters": 5000,
+    "lr": 0.03,
+    "depth": 8,
+    "l2": 3.0,
+    "od_wait": 500,
+    "balance": "route_quota",
+    "target_pos": 0.35,
+    "neg_cap_per_group": 500,
+    "device": "cpu",
+    "drop_features": [],
+    "prune_below": null,
+    "seed": 42,
+    "rf_trees": 1000,
+    "rf_max_depth": 12,
+    "rf_min_leaf": 20,
+    "rf_max_features": "sqrt"
+  }
+}

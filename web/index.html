@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Flight Delay AI - Inteligência Artificial para Previsão de Atrasos</title>
+
+  <!-- Leaflet (mapa) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+          crossorigin=""></script>
+</head>
+<body>
+  <div class="background"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="hero">
+    <div class="logo-container">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" fill="white"/>
+        </svg>
+      </div>
+    </div>
+    <h1>Flight Delay AI</h1>
+    <p class="subtitle">Inteligência Artificial Avançada para Previsão de Atrasos em Voos</p>
+    <div class="scroll-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg></div>
+  </div>
+
+  <div class="container">
+    <div class="glass-container">
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="basic">🚀 Análise Rápida</button>
+        <button class="mode-btn" data-mode="advanced">🔬 Análise Avançada</button>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-card">
+          <div class="input-icon">✈️</div>
+          <label class="input-label">Origem</label>
+          <select class="modern-select" id="origem" required>
+            <option value="">Selecione o aeroporto</option>
+          </select>
+        </div>
+
+        <div class="input-card">
+          <div class="input-icon">🎯</div>
+          <label class="input-label">Destino</label>
+          <select class="modern-select" id="destino" required>
+            <option value="">Selecione o aeroporto</option>
+          </select>
+        </div>
+
+        <div class="input-card">
+          <div class="input-icon">📅</div>
+          <label class="input-label">Data e Hora</label>
+          <input type="datetime-local" class="modern-input" id="partida" required>
+        </div>
+
+        <div class="input-card">
+          <div class="input-icon">🏢</div>
+          <label class="input-label">Companhia Aérea</label>
+          <select class="modern-select" id="airline" required>
+            <option value="">Selecione a companhia</option>
+            <option value="G3">GOL Linhas Aéreas</option>
+            <option value="LA">LATAM Airlines</option>
+            <option value="AD">Azul Linhas Aéreas</option>
+            <option value="2Z">Voepass</option>
+          </select>
+        </div>
+
+        <div class="input-card">
+          <div class="input-icon">🔄</div>
+          <label class="input-label">Conexões</label>
+          <select class="modern-select" id="paradas">
+            <option value="0">Voo Direto</option>
+            <option value="1">1 Conexão</option>
+            <option value="2">2 Conexões</option>
+          </select>
+        </div>
+
+        <!-- MAPA -->
+        <div class="input-card" id="mapCard">
+          <div class="input-icon">🗺️</div>
+          <label class="input-label">Selecione no mapa (clique em um aeroporto)</label>
+          <div id="map"></div>
+          <div class="map-toolbar">
+            <span id="selOrigin" class="chip active">Selecionar Origem</span>
+            <span id="selDest" class="chip">Selecionar Destino</span>
+            <span class="chip" id="clearSel">Limpar Seleções</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVANÇADO -->
+      <div class="advanced-section" id="advancedSection">
+        <h3 style="margin:1rem 0 .5rem;color:#cbd5e1;">Parâmetros Avançados</h3>
+
+        <div class="input-grid">
+          <div class="input-card">
+            <div class="input-icon">🔢</div>
+            <label class="input-label">Número do Voo</label>
+            <input type="text" class="modern-input" id="numero_voo" placeholder="Ex.: LA3158">
+          </div>
+
+          <div class="input-card">
+            <div class="input-icon">☁️</div>
+            <label class="input-label">Cenário do Tempo</label>
+            <select class="modern-select" id="scenarioSelect">
+              <option value="climo">Climatologia (padrão)</option>
+              <option value="clear">Céu Limpo</option>
+              <option value="manual">Manual (editar abaixo)</option>
+            </select>
+          </div>
+
+          <div class="input-card">
+            <div class="input-icon">📊</div>
+            <label class="input-label">Tráfego do Aeroporto (Origem)</label>
+            <select class="modern-select" id="trafico">
+              <option value="low">Baixo</option>
+              <option value="medium" selected>Médio</option>
+              <option value="high">Alto</option>
+              <option value="very_high">Muito Alto</option>
+            </select>
+          </div>
+
+          <div class="input-card">
+            <div class="input-icon">🌧️</div>
+            <label class="input-label">Clima (Origem)</label>
+            <select class="modern-select" id="clima_origem">
+              <option value="0">Céu Limpo</option>
+              <option value="1">Parcialmente Nublado</option>
+              <option value="2">Nublado</option>
+              <option value="3">Chuva Leve</option>
+              <option value="4">Tempestade</option>
+            </select>
+          </div>
+
+          <div class="input-card">
+            <div class="input-icon">⛈️</div>
+            <label class="input-label">Clima (Destino)</label>
+            <select class="modern-select" id="clima_destino">
+              <option value="0">Céu Limpo</option>
+              <option value="1">Parcialmente Nublado</option>
+              <option value="2">Nublado</option>
+              <option value="3">Chuva Leve</option>
+              <option value="4">Tempestade</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botão de preset -->
+        <button type="button" id="presetHighDelay" class="mode-btn" style="margin-bottom:.5rem">
+          💥 Simular Atraso Alto
+        </button>
+
+        <!-- Manual overrides extras (exibidos apenas se scenario=manual) -->
+        <div id="manualExtras" style="display:none; margin-top:.5rem;">
+          <h4 style="margin:.5rem 0;color:#cbd5e1;">Overrides Manuais (opcional)</h4>
+          <div class="input-grid">
+            <div class="input-card">
+              <label class="input-label">Prob. Chuva Origem (chuva_id)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_chuva_dep" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Prob. Tempo Ruim Origem (tempo_ruim_id)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_bad_dep" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Prob. Chuva Destino (chuva_arr_id)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_chuva_arr" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Prob. Tempo Ruim Destino (tempo_ruim_arr_id)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_bad_arr" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Cobertura WX Origem (wx_dep_cov)</label>
+              <input type="range" min="0" max="1" step="1" id="ov_wx_dep_cov" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Cobertura WX Destino (wx_arr_cov)</label>
+              <input type="range" min="0" max="1" step="1" id="ov_wx_arr_cov" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Distância (km) override (dist_km)</label>
+              <input type="number" step="0.1" id="ov_dist_km" class="modern-input" placeholder="auto pelo mapa">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Tamanho Aeroporto (airport_size_id)</label>
+              <select id="ov_airport_size" class="modern-select">
+                <option value="">auto</option>
+                <option value="1">Pequeno</option>
+                <option value="2">Médio</option>
+                <option value="3">Grande</option>
+              </select>
+            </div>
+            <div class="input-card">
+              <label class="input-label">Congestion Ratio (0–1)</label>
+              <input type="number" step="0.05" min="0" max="1" id="ov_congestion_ratio" class="modern-input" placeholder="ex.: 0.5">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Congestion Bucket</label>
+              <select id="ov_congestion_bucket" class="modern-select">
+                <option value="">auto</option>
+                <option value="0">0 (baixo)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3 (alto)</option>
+              </select>
+            </div>
+
+            <!-- HISTÓRICOS -->
+            <div class="input-card">
+              <label class="input-label">Hist. atraso empresa (hist_atraso_empresa_50)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_hist_empresa" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Hist. atraso rota (hist_atraso_rota_30)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_hist_rota" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Hist. atraso nº voo (hist_atraso_num_voo_10)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_hist_num_voo" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Hist. atraso origem×hora (hist_atraso_origem_hora_30)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_hist_origem_hora" class="modern-input">
+            </div>
+            <div class="input-card">
+              <label class="input-label">Hist. desvio rota (hist_std_rota_30)</label>
+              <input type="range" min="0" max="1" step="0.01" id="ov_hist_std_rota" class="modern-input">
+            </div>
+          </div>
+          <small style="color:#9aa4b2">⚠️ Requer backend aceitando <code>web_overrides</code> e colunas existentes em <code>cols</code>.</small>
+        </div>
+      </div>
+
+      <button class="analyze-btn" id="analyzeBtn">
+        <span id="btnText">🚀 Analisar com IA</span>
+        <span class="loading-ring" style="display:none;"></span>
+      </button>
+
+      <div class="results-container" id="resultsContainer">
+        <div class="result-header">
+          <h2 style="font-size:2rem;margin-bottom:.5rem;">Análise Completa</h2>
+        </div>
+
+        <div class="risk-meter-container">
+          <svg class="risk-meter-svg" viewBox="0 0 300 300">
+            <circle cx="150" cy="150" r="120" class="risk-meter-bg"></circle>
+            <circle cx="150" cy="150" r="120" class="risk-meter-fill" id="riskMeterFill"
+                    stroke-dasharray="754" stroke-dashoffset="754"></circle>
+          </svg>
+          <div class="risk-percentage" id="riskPercentage">0%</div>
+          <div class="risk-label" id="riskLabel">Calculando...</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="routeStat">--</div>
+            <div class="stat-label">Rota</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="timeStat">--</div>
+            <div class="stat-label">Horário</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="airlineStat">--</div>
+            <div class="stat-label">Companhia</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="recommendationStat" style="font-size:1.1rem;">--</div>
+            <div class="stat-label">Recomendação</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </div>
+
+  <div class="notification" id="notification">✨ Análise concluída com sucesso!</div>
+
+  <script src="index.js" defer></script>
+</body>
+</html>

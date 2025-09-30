@@ -1,0 +1,23 @@
+{
+  "name": "flight-delay-predictor-gpu",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": ["--gpus", "all"],
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-toolsai.jupyter"]
+    }
+  },
+  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt || true",
+  "remoteUser": "root",
+  "mounts": [
+    "source=//c/Users/Lucas/Desktop/flight-delay-predictor,target=/workspace,type=bind"
+  ],
+  "workspaceFolder": "/workspace",
+  "containerEnv": {
+    "PYTHONIOENCODING": "UTF-8",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1"
+  },
+  "forwardPorts": [8888, 8000]
+}

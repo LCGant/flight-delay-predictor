@@ -1,0 +1,10 @@
+{
+  "base_rate_delay_per_100": 17.53,
+  "alerts_per_100": 4.02,
+  "tp_per_100": 2.41,
+  "fp_per_100": 1.61,
+  "fn_per_100": 15.12,
+  "tn_per_100": 80.86,
+  "precision": 0.6,
+  "recall": 0.13747807590401911
+}

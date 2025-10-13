@@ -28,9 +28,8 @@ Este projeto implementa um **pipeline offline** que aprende padrões **estrutura
 12. Reprodutibilidade e Boas Práticas
 13. **Features utilizadas e decisões de escopo**
 14. Limitações & Próximos Passos
-15. Materiais de Apresentação (reservado)
-16. Referências
-17. Licença
+15. Referências
+16. Licença
 
 ---
 
@@ -295,25 +294,7 @@ curl http://127.0.0.1:8000/health
 
 ---
 
-## 15) Materiais de Apresentação (reservado)
-
-Coloque os arquivos em `docs/media/` e atualize os caminhos.
-
-* **Vídeo — pipeline rodando (treino + API + predição)**: `docs/media/demo_pipeline.mp4`
-* **Screenshot — Extensão do Chrome**: `docs/media/extensao_google_voos.png`
-* **Screenshot — Front‑end**: `docs/media/frontend_risco.png`
-
-Exemplo de embed:
-
-```markdown
-![Pipeline rodando](docs/media/demo_pipeline.gif)
-![Extensão Chrome](docs/media/extensao_google_voos.png)
-![Front-end](docs/media/frontend_risco.png)
-```
-
----
-
-## 16) Referências
+## 15) Referências
 
 [1] Tang, Y. (2021). *Airline Flight Delay Prediction Using Machine Learning Models*. 5th Int. Conf. on E‑Business and Internet. [https://doi.org/10.1145/3497701.3497725](https://doi.org/10.1145/3497701.3497725)
 [2] Hatıpoğlu, I., & Tosun, Ö. (2024). *Predictive Modeling of Flight Delays at an Airport Using Machine Learning Methods*. Applied Sciences, 14(13), 5472. [https://doi.org/10.3390/app14135472](https://doi.org/10.3390/app14135472)
@@ -323,6 +304,6 @@ Exemplo de embed:
 
 ---
 
-## 17) Licença
+## 16) Licença
 
 Este projeto é distribuído sob a licença **MIT**. Veja `LICENSE`.

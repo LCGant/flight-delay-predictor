@@ -73,6 +73,12 @@
         </div>
 
         <div class="input-card">
+          <div class="input-icon">⏱️</div>
+          <label class="input-label">Duração Estimada</label>
+          <input type="number" class="modern-input" id="duracao" placeholder="Minutos" min="30" max="1200">
+        </div>
+
+        <div class="input-card">
           <div class="input-icon">🔄</div>
           <label class="input-label">Conexões</label>
           <select class="modern-select" id="paradas">
@@ -287,6 +293,414 @@
 
   <div class="notification" id="notification">✨ Análise concluída com sucesso!</div>
 
-  <script src="index.js" defer></script>
+  <script>
+    // Partículas
+    (function createParticles(){
+      const c = document.getElementById('particles');
+      for (let i=0;i<50;i++){
+        const p=document.createElement('div');
+        p.className='particle';
+        p.style.left=Math.random()*100+'%';
+        p.style.animationDelay=Math.random()*10+'s';
+        p.style.animationDuration=(10+Math.random()*10)+'s';
+        c.appendChild(p);
+      }
+    })();
+
+    // === API ===
+    let API_URL = 'http://127.0.0.1:8000/predict';
+    const apiUrlInput = document.getElementById('apiUrlInput');
+    apiUrlInput && (apiUrlInput.value = API_URL);
+    apiUrlInput && apiUrlInput.addEventListener('change',()=>{ API_URL = apiUrlInput.value.trim() || API_URL; });
+
+    // Modo
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const advancedSection = document.getElementById('advancedSection');
+    let currentMode = 'basic';
+    modeBtns.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        modeBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        if (currentMode==='advanced'){ advancedSection.classList.add('show'); }
+        else { advancedSection.classList.remove('show'); }
+      });
+    });
+
+    // === Aeroportos BR (IATA -> nome + coords) ===
+    const AIRPORTS = {
+      "GRU":{name:"São Paulo/Guarulhos",lat:-23.4356,lon:-46.4731},
+      "CGH":{name:"São Paulo/Congonhas",lat:-23.6261,lon:-46.6566},
+      "VCP":{name:"Campinas/Viracopos",lat:-23.0074,lon:-47.1344},
+      "GIG":{name:"Rio de Janeiro/Galeão",lat:-22.8089,lon:-43.2436},
+      "SDU":{name:"Rio de Janeiro/Santos Dumont",lat:-22.9105,lon:-43.1631},
+      "BSB":{name:"Brasília",lat:-15.8711,lon:-47.9186},
+      "CNF":{name:"Belo Horizonte/Confins",lat:-19.6337,lon:-43.9689},
+      "PLU":{name:"Belo Horizonte/Pampulha",lat:-19.8512,lon:-43.9506},
+      "POA":{name:"Porto Alegre",lat:-29.9939,lon:-51.1714},
+      "CWB":{name:"Curitiba",lat:-25.5285,lon:-49.1758},
+      "FLN":{name:"Florianópolis",lat:-27.6703,lon:-48.5525},
+      "NVT":{name:"Navegantes",lat:-26.8794,lon:-48.6514},
+      "JOI":{name:"Joinville",lat:-26.2245,lon:-48.7973},
+      "XAP":{name:"Chapecó",lat:-27.1342,lon:-52.6566},
+      "LDB":{name:"Londrina",lat:-23.3336,lon:-51.1301},
+      "MGF":{name:"Maringá",lat:-23.4761,lon:-52.0164},
+      "CGR":{name:"Campo Grande",lat:-20.4687,lon:-54.6725},
+      "IGU":{name:"Foz do Iguaçu",lat:-25.5951,lon:-54.4872},
+      "RAO":{name:"Ribeirão Preto",lat:-21.1364,lon:-47.7767},
+      "SJP":{name:"São José do Rio Preto",lat:-20.8160,lon:-49.4060},
+      "PPB":{name:"Presidente Prudente",lat:-22.1751,lon:-51.4247},
+      "SJK":{name:"São José dos Campos",lat:-23.2282,lon:-45.8628},
+      "VIX":{name:"Vitória",lat:-20.2581,lon:-40.2864},
+      "SSA":{name:"Salvador",lat:-12.9086,lon:-38.3225},
+      "IOS":{name:"Ilhéus",lat:-14.8157,lon:-39.0333},
+      "BPS":{name:"Porto Seguro",lat:-16.4386,lon:-39.0809},
+      "AJU":{name:"Aracaju",lat:-10.9844,lon:-37.0703},
+      "MCZ":{name:"Maceió",lat:-9.5108,lon:-35.7927},
+      "REC":{name:"Recife",lat:-8.1267,lon:-34.9236},
+      "JPA":{name:"João Pessoa",lat:-7.1458,lon:-34.9486},
+      "NAT":{name:"Natal",lat:-5.7681,lon:-35.3665},
+      "FOR":{name:"Fortaleza",lat:-3.7775,lon:-38.5326},
+      "JDO":{name:"Juazeiro do Norte",lat:-7.2180,lon:-39.2700},
+      "THE":{name:"Teresina",lat:-5.0599,lon:-42.8235},
+      "SLZ":{name:"São Luís",lat:-2.5854,lon:-44.2341},
+      "BEL":{name:"Belém",lat:-1.3793,lon:-48.4763},
+      "MCP":{name:"Macapá",lat:0.0507,lon:-51.0721},
+      "STM":{name:"Santarém",lat:-2.4247,lon:-54.7859},
+      "MAO":{name:"Manaus",lat:-3.0386,lon:-60.0497},
+      "TFF":{name:"Tefé",lat:-3.3829,lon:-64.7241},
+      "TBT":{name:"Tabatinga",lat:-4.2556,lon:-69.9358},
+      "PVH":{name:"Porto Velho",lat:-8.7093,lon:-63.9023},
+      "RBR":{name:"Rio Branco",lat:-9.8689,lon:-67.8944},
+      "CGB":{name:"Cuiabá",lat:-15.6529,lon:-56.1181},
+      "GYN":{name:"Goiânia",lat:-16.6319,lon:-49.2267},
+      "UDI":{name:"Uberlândia",lat:-18.8836,lon:-48.2253},
+      "UBA":{name:"Uberaba",lat:-19.7648,lon:-47.9661},
+      "CXJ":{name:"Caxias do Sul",lat:-29.1971,lon:-51.1875},
+      "POA":{name:"Porto Alegre",lat:-29.9939,lon:-51.1714},
+      "URG":{name:"Uruguaiana",lat:-29.7822,lon:-57.0382},
+      "FEN":{name:"Fernando de Noronha",lat:-3.8549,lon:-32.4233},
+      "VDC":{name:"Vitória da Conquista",lat:-14.8628,lon:-40.8631},
+      "BVB":{name:"Boa Vista",lat:2.8461,lon:-60.6901}
+    };
+
+    const origemSel = document.getElementById('origem');
+    const destinoSel = document.getElementById('destino');
+
+    function fillAirportSelects(){
+      const opts = ['<option value="">Selecione o aeroporto</option>'];
+      Object.entries(AIRPORTS).forEach(([iata,info])=>{
+        opts.push(`<option value="${iata}">${iata} - ${info.name}</option>`);
+      });
+      origemSel.innerHTML = opts.join('');
+      destinoSel.innerHTML = opts.join('');
+    }
+    fillAirportSelects();
+
+    // Mapa
+    let map, markers = {}, activePick = 'origin';
+    function initMap(){
+      map = L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([-14.2350,-51.9253], 4);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+
+      Object.entries(AIRPORTS).forEach(([iata,info])=>{
+        const m = L.marker([info.lat, info.lon]).addTo(map);
+        m.bindTooltip(`${iata} - ${info.name}`);
+        m.on('click',()=>{
+          if (activePick==='origin'){ origemSel.value=iata; }
+          else { destinoSel.value=iata; }
+          highlightSelection();
+        });
+        markers[iata] = m;
+      });
+    }
+    initMap();
+
+    function highlightSelection(){
+      const o = origemSel.value, d = destinoSel.value;
+      Object.entries(markers).forEach(([iata,m])=>{
+        m.setOpacity((iata===o || iata===d)?1.0:0.5);
+      });
+      if (window.routeLine){ map.removeLayer(window.routeLine); window.routeLine=null; }
+      if (o && d && AIRPORTS[o] && AIRPORTS[d]){
+        const latlngs = [[AIRPORTS[o].lat,AIRPORTS[o].lon],[AIRPORTS[d].lat,AIRPORTS[d].lon]];
+        window.routeLine = L.polyline(latlngs,{color:'#7c3aed',weight:3,opacity:.9}).addTo(map);
+        map.fitBounds(window.routeLine.getBounds().pad(0.25));
+      }
+    }
+
+    const selOriginChip = document.getElementById('selOrigin');
+    const selDestChip = document.getElementById('selDest');
+    const clearSelChip = document.getElementById('clearSel');
+    selOriginChip.addEventListener('click',()=>{activePick='origin';selOriginChip.classList.add('active');selDestChip.classList.remove('active');});
+    selDestChip.addEventListener('click',()=>{activePick='dest';selDestChip.classList.add('active');selOriginChip.classList.remove('active');});
+    clearSelChip.addEventListener('click',()=>{
+      origemSel.value=""; destinoSel.value="";
+      if (window.routeLine){ map.removeLayer(window.routeLine); window.routeLine=null; }
+      Object.values(markers).forEach(m=>m.setOpacity(1));
+    });
+
+    origemSel.addEventListener('change', highlightSelection);
+    destinoSel.addEventListener('change', highlightSelection);
+
+    // Helpers
+    function haversineKm(lat1,lon1,lat2,lon2){
+      const R=6371, toRad=x=>x*Math.PI/180;
+      const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+      const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+      return 2*R*Math.asin(Math.sqrt(a));
+    }
+
+    // Avançado: cenário/manual extras
+    const scenarioSelect = document.getElementById('scenarioSelect');
+    const manualExtras = document.getElementById('manualExtras');
+    scenarioSelect.addEventListener('change',()=>{
+      manualExtras.style.display = (scenarioSelect.value==='manual') ? 'block' : 'none';
+      if (scenarioSelect.value!=='manual'){
+        // zera sliders para não confundir
+        ['ov_chuva_dep','ov_bad_dep','ov_chuva_arr','ov_bad_arr','ov_hist_empresa','ov_hist_rota','ov_hist_num_voo','ov_hist_origem_hora','ov_hist_std_rota']
+          .forEach(id=>{ const el=document.getElementById(id); el && (el.value=""); });
+      }
+    });
+
+    // Mapeamento básico de clima -> (p_rain, p_bad)
+    const CLIMA_MAP = {
+      0:{p_rain:0.00,p_bad:0.00},  // Céu limpo
+      1:{p_rain:0.08,p_bad:0.10},  // Parc. nublado
+      2:{p_rain:0.15,p_bad:0.20},  // Nublado
+      3:{p_rain:0.35,p_bad:0.45},  // Chuva leve
+      4:{p_rain:0.65,p_bad:0.80}   // Tempestade
+    };
+
+    // UI
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const btnText = document.getElementById('btnText');
+    const resultsContainer = document.getElementById('resultsContainer');
+
+    // Botão preset "Atraso Alto"
+    const presetBtn = document.getElementById('presetHighDelay');
+    if (presetBtn) {
+      presetBtn.addEventListener('click', () => {
+        currentMode = 'advanced';
+        advancedSection.classList.add('show');
+
+        scenarioSelect.value = 'manual';
+        manualExtras.style.display = 'block';
+
+        // Clima e tráfego no máximo
+        document.getElementById('clima_origem').value = '4';
+        document.getElementById('clima_destino').value = '4';
+        document.getElementById('trafico').value = 'very_high';
+
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+        setVal('ov_congestion_ratio', '0.95');
+        setVal('ov_congestion_bucket', '3');
+        setVal('ov_wx_dep_cov', '1');
+        setVal('ov_wx_arr_cov', '1');
+
+        // HISTÓRICOS altos
+        setVal('ov_hist_empresa', '0.85');
+        setVal('ov_hist_rota',    '0.80');
+        setVal('ov_hist_num_voo', '0.90');
+        setVal('ov_hist_origem_hora','0.70');
+        setVal('ov_hist_std_rota','0.80');
+
+        // Horário pior (noite)
+        try {
+          const inp = document.getElementById('partida');
+          if (inp && inp.value) {
+            const t = new Date(inp.value);
+            t.setHours(19, 30, 0, 0);
+            // ajustar para local -> input[type=datetime-local]
+            inp.value = new Date(t.getTime() - t.getTimezoneOffset()*60000).toISOString().slice(0,16);
+          }
+        } catch (e) {}
+      });
+    }
+
+    analyzeBtn.addEventListener('click', async ()=>{
+      const origem = origemSel.value;
+      const destino = destinoSel.value;
+      const partida = document.getElementById('partida').value;
+      const airline = document.getElementById('airline').value;
+
+      if (!origem || !destino || !partida || !airline){
+        showNotification('⚠️ Preencha origem, destino, data/hora e companhia.', 'warning'); return;
+      }
+
+      analyzeBtn.classList.add('loading');
+      btnText.innerHTML = 'Analisando com IA... <span class="loading-ring" style="display:inline-block; margin-left:10px;"></span>';
+
+      const departureISO = new Date(partida).toISOString();
+      const duracao = document.getElementById('duracao').value;
+      let arrivalISO = null;
+      if (duracao){
+        const t = new Date(partida); t.setMinutes(t.getMinutes()+parseInt(duracao,10)); arrivalISO = t.toISOString();
+      }
+
+      const scenario = (currentMode === 'basic') ? 'climo' : (scenarioSelect.value || 'climo');
+      const payload = {
+        origin_iata: origem,
+        dest_iata: destino,
+        departure_iso: departureISO,
+        arrival_iso: arrivalISO,
+        duration_min: duracao ? parseFloat(duracao) : null,
+        stops: parseInt(document.getElementById('paradas').value, 10),
+        operating_airline_iata: airline,
+        scenario
+      };
+
+      const numero_voo = (document.getElementById('numero_voo').value || '').trim();
+      if (numero_voo) payload.flight_number = numero_voo;
+
+      // Distância aproximada (para eventual override)
+      if (AIRPORTS[origem] && AIRPORTS[destino]){
+        const dk = haversineKm(AIRPORTS[origem].lat,AIRPORTS[origem].lon,AIRPORTS[destino].lat,AIRPORTS[destino].lon);
+        const ovDist = document.getElementById('ov_dist_km');
+        if (ovDist && !ovDist.value) ovDist.value = dk.toFixed(1);
+      }
+
+      // Enviar info avançada como "web_overrides" (para backend que suporte)
+      if (currentMode==='advanced'){
+        const traf = document.getElementById('trafico').value;
+        const climO = parseInt(document.getElementById('clima_origem').value,10);
+        const climD = parseInt(document.getElementById('clima_destino').value,10);
+
+        const trafMap = {low:{load:0,ratio:0.25,bkt:0}, medium:{load:1,ratio:0.50,bkt:1}, high:{load:2,ratio:0.75,bkt:2}, very_high:{load:3,ratio:0.90,bkt:3}};
+        const tSel = trafMap[traf] || trafMap.medium;
+
+        const ov = {
+          // clima compacto
+          chuva_id: CLIMA_MAP[climO].p_rain,
+          tempo_ruim_id: CLIMA_MAP[climO].p_bad,
+          chuva_arr_id: CLIMA_MAP[climD].p_rain,
+          tempo_ruim_arr_id: CLIMA_MAP[climD].p_bad,
+          wx_dep_cov: 1, wx_arr_cov: 1, wx_dep_all_missing: 0, wx_arr_all_missing: 0,
+          // congestionamento/carga
+          load_origem_15: tSel.load,
+          congestion_ratio: tSel.ratio,
+          congestion_bucket: tSel.bkt
+        };
+
+        // Overrides manuais extras (se scenario=manual)
+        if (scenario==='manual'){
+          const getNum = id => {
+            const el = document.getElementById(id);
+            if (!el || el.value === '') return undefined;
+            const v = parseFloat(el.value); return isFinite(v) ? v : undefined;
+          };
+          ov.chuva_id         = getNum('ov_chuva_dep') ?? ov.chuva_id;
+          ov.tempo_ruim_id    = getNum('ov_bad_dep')   ?? ov.tempo_ruim_id;
+          ov.chuva_arr_id     = getNum('ov_chuva_arr') ?? ov.chuva_arr_id;
+          ov.tempo_ruim_arr_id= getNum('ov_bad_arr')   ?? ov.tempo_ruim_arr_id;
+
+          const covd = getNum('ov_wx_dep_cov'); if (covd!==undefined) ov.wx_dep_cov = covd;
+          const cova = getNum('ov_wx_arr_cov'); if (cova!==undefined) ov.wx_arr_cov = cova;
+
+          const dk = getNum('ov_dist_km'); if (dk!==undefined) ov.dist_km = dk;
+          const asz = document.getElementById('ov_airport_size').value; if (asz) ov.airport_size_id = parseInt(asz,10);
+          const r = getNum('ov_congestion_ratio'); if (r!==undefined) ov.congestion_ratio = r;
+          const b = document.getElementById('ov_congestion_bucket').value; if (b) ov.congestion_bucket = parseInt(b,10);
+
+          // --- HISTÓRICOS ---
+          const hv = id => {
+            const el = document.getElementById(id);
+            if (!el || el.value === '') return undefined;
+            const v = parseFloat(el.value);
+            return isFinite(v) ? v : undefined;
+          };
+          const h_emp   = hv('ov_hist_empresa');
+          const h_rota  = hv('ov_hist_rota');
+          const h_num   = hv('ov_hist_num_voo');
+          const h_ohora = hv('ov_hist_origem_hora');
+          const h_std   = hv('ov_hist_std_rota');
+
+          if (h_emp   !== undefined) ov.hist_atraso_empresa_50      = h_emp;
+          if (h_rota  !== undefined) ov.hist_atraso_rota_30         = h_rota;
+          if (h_num   !== undefined) ov.hist_atraso_num_voo_10      = h_num;
+          if (h_ohora !== undefined) ov.hist_atraso_origem_hora_30  = h_ohora;
+          if (h_std   !== undefined) ov.hist_std_rota_30            = h_std;
+        }
+
+        payload.web_overrides = ov;
+        payload.user_tags = { trafico: traf, clima_origem: climO, clima_destino: climD };
+      }
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        displayResults(data, origem, destino, partida, airline);
+        showNotification('✨ Análise concluída com sucesso!', 'success');
+      } catch (err) {
+        console.error("[FD] API error:", err);
+        showNotification('❌ Erro ao conectar com a API. Verifique se está rodando e a porta/CORS.', 'error');
+      } finally {
+        analyzeBtn.classList.remove('loading');
+        btnText.innerHTML = '🚀 Analisar com IA';
+      }
+    });
+
+    function displayResults(data, origem, destino, partida, airline){
+      const probability = (typeof data.probability === 'number') ? data.probability : 0;
+      const percentage = Math.round(probability * 100);
+
+      resultsContainer.classList.add('show');
+
+      const riskMeterFill = document.getElementById('riskMeterFill');
+      const riskPercentage = document.getElementById('riskPercentage');
+      const riskLabel = document.getElementById('riskLabel');
+
+      let color,label;
+      if (percentage < 30){ color='#10b981'; label='Baixo Risco'; }
+      else if (percentage < 70){ color='#f59e0b'; label='Risco Moderado'; }
+      else { color='#ef4444'; label='Alto Risco'; }
+      riskMeterFill.style.stroke = color;
+
+      let current=0, inc=Math.max(1, Math.round(percentage/50));
+      const timer=setInterval(()=>{
+        current+=inc;
+        if (current>=percentage){ current=percentage; clearInterval(timer); }
+        riskPercentage.textContent=current+'%';
+        const offset=754-(754*current/100);
+        riskMeterFill.style.strokeDashoffset=offset;
+      },20);
+      riskLabel.textContent = label;
+
+      document.getElementById('routeStat').textContent = `${origem} → ${destino}`;
+      const d = new Date(partida);
+      document.getElementById('timeStat').textContent = d.toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});
+      const airlineNames = { 'G3':'GOL', 'LA':'LATAM', 'AD':'Azul', '2Z':'Voepass' };
+      document.getElementById('airlineStat').textContent = airlineNames[airline] || airline;
+
+      let rec = (percentage<30) ? '✅ Voo pontual' : (percentage<70) ? '⚠️ Chegue cedo' : '🔴 Considere alternativas';
+      document.getElementById('recommendationStat').textContent = rec;
+
+      resultsContainer.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
+
+    function showNotification(message, type='success'){
+      const el = document.getElementById('notification');
+      el.textContent = message;
+      if (type==='error') el.style.background='linear-gradient(135deg,#ef4444,#dc2626)';
+      else if (type==='warning') el.style.background='linear-gradient(135deg,#f59e0b,#d97706)';
+      else el.style.background='linear-gradient(135deg,#10b981,#059669)';
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'), 3000);
+    }
+
+    // default datetime: amanhã 10:00 + smooth scroll
+    window.addEventListener('load',()=>{
+      const t = new Date(); t.setDate(t.getDate()+1); t.setHours(10,0,0,0);
+      document.getElementById('partida').value = new Date(t.getTime() - t.getTimezoneOffset()*60000).toISOString().slice(0,16);
+      document.querySelector('.scroll-indicator').addEventListener('click',()=>{
+        document.querySelector('.container').scrollIntoView({ behavior:'smooth' });
+      });
+    });
+  </script>
 </body>
 </html>

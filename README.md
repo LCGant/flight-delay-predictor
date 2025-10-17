@@ -86,6 +86,32 @@ Este projeto implementa um **pipeline offline** que aprende padrões **estrutura
 
 ---
 
+## 🔗 3.1) Acesso à Pasta `data/` (Modelos e Artefatos)
+
+Para reproduzir completamente o projeto — incluindo o **treinamento**, a **inferência offline** e a execução da **API local (FastAPI)** — é necessário ter acesso à pasta `data/`, que contém:
+
+* **`data/processed/`** — conjuntos de treino, validação e teste (`.parquet`);
+* **`data/models/`** — artefatos treinados (`.joblib`, `.cbm`);
+* **`data/feature_store/`** *(opcional)* — cache intermediário de features.
+
+📦 **Baixe a pasta completa no Google Drive:**
+
+👉 [**Acessar pasta `data` no Google Drive**]([https://drive.google.com/drive/folders/SEU_LINK_AQUI?usp=sharing](https://drive.google.com/file/d/1uAVZTdl7ww-_uRZIcSWiL-t7UN7XxLND/view?usp=drive_link))
+
+Após o download, **coloque o diretório `data/` na raiz do projeto**, conforme a estrutura abaixo:
+
+```
+.
+├── data/
+│   ├── processed/
+│   ├── models/
+│   └── feature_store/
+├── src/
+├── api/
+└── chrome_extension/
+
+---
+
 ## 4) Metodologia (alto nível)
 
 * **ETL & Features:** normalização de tipos; distância por Haversine; janelas históricas **anti‑vazamento** com `shift()`; proxies operacionais (congestionamento/buckets); calendário (mês, dia, feriados, período); codificação cíclica de hora (`sin/cos`).

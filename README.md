@@ -96,7 +96,7 @@ Para reproduzir completamente o projeto — incluindo o **treinamento**, a **inf
 
 📦 **Baixe a pasta completa no Google Drive:**
 
-👉 [**Acessar pasta `data` no Google Drive**]([https://drive.google.com/drive/folders/SEU_LINK_AQUI?usp=sharing](https://drive.google.com/file/d/1uAVZTdl7ww-_uRZIcSWiL-t7UN7XxLND/view?usp=drive_link))
+👉 [**Acessar pasta `data` no Google Drive**](https://drive.google.com/file/d/1uAVZTdl7ww-_uRZIcSWiL-t7UN7XxLND/view?usp=drive_link)
 
 ---
 

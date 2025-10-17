@@ -98,18 +98,6 @@ Para reproduzir completamente o projeto — incluindo o **treinamento**, a **inf
 
 👉 [**Acessar pasta `data` no Google Drive**]([https://drive.google.com/drive/folders/SEU_LINK_AQUI?usp=sharing](https://drive.google.com/file/d/1uAVZTdl7ww-_uRZIcSWiL-t7UN7XxLND/view?usp=drive_link))
 
-Após o download, **coloque o diretório `data/` na raiz do projeto**, conforme a estrutura abaixo:
-
-```
-.
-├── data/
-│   ├── processed/
-│   ├── models/
-│   └── feature_store/
-├── src/
-├── api/
-└── chrome_extension/
-
 ---
 
 ## 4) Metodologia (alto nível)
